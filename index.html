@@ -5,7 +5,7 @@
   <title>Treinamento de Tomada de Decisão - Arbitragem</title>
   <style>
     body {
-      background-color: #121212;
+      background-color: #0b0d12;
       color: white;
       font-family: Arial, sans-serif;
       display: flex;
@@ -16,18 +16,77 @@
       margin: 0;
       padding: 20px;
       box-sizing: border-box;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* --- Fundo Animado com Elementos Grandes e Nítidos --- */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #1a2233 0%, #08090d 100%);
+    }
+
+    .floating-item {
+      position: absolute;
+      font-weight: 900;
+      user-select: none;
+      animation: floatAround linear infinite;
+    }
+
+    /* Estilos e Cores Nítidas por Classe */
+    .item-yellow {
+      color: #ffcc00;
+      text-shadow: 0 0 20px rgba(255, 204, 0, 0.6), 0 0 40px rgba(255, 204, 0, 0.3);
+    }
+
+    .item-red {
+      color: #ff3333;
+      text-shadow: 0 0 20px rgba(255, 51, 51, 0.6), 0 0 40px rgba(255, 51, 51, 0.3);
+    }
+
+    .item-white {
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+
+    @keyframes floatAround {
+      0% {
+        transform: translateY(105vh) rotate(0deg) scale(0.9);
+        opacity: 0;
+      }
+      15% {
+        opacity: 0.75;
+      }
+      85% {
+        opacity: 0.75;
+      }
+      100% {
+        transform: translateY(-20vh) rotate(360deg) scale(1.2);
+        opacity: 0;
+      }
     }
 
     .screen {
       display: none;
       width: 1200px;
       max-width: 98vw;
-      background: #1e1e1e;
+      background: rgba(22, 24, 30, 0.94);
+      backdrop-filter: blur(12px);
       padding: 25px;
       border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      box-shadow: 0 10px 35px rgba(0,0,0,0.9), 0 0 20px rgba(255, 204, 0, 0.2);
+      border: 1px solid rgba(255, 204, 0, 0.2);
       text-align: center;
       box-sizing: border-box;
+      position: relative;
+      z-index: 1;
     }
 
     .screen.active { display: block; }
@@ -53,6 +112,13 @@
       font-weight: bold;
       border-radius: 6px;
       cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 204, 0, 0.4);
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .btn-start:hover, .btn-restart:hover {
+      transform: scale(1.05);
+      background: #ffe066;
     }
 
     .game-container {
@@ -61,6 +127,7 @@
       background: #000;
       border-radius: 8px;
       overflow: hidden;
+      box-shadow: 0 0 20px rgba(0,0,0,0.9);
     }
 
     .header-info {
@@ -85,7 +152,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.75);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -110,7 +177,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 20px rgba(255, 152, 0, 0.8);
+      box-shadow: 0 0 25px rgba(255, 152, 0, 0.9);
+      animation: pulseTimer 1s infinite alternate;
+    }
+
+    @keyframes pulseTimer {
+      from { transform: scale(1); }
+      to { transform: scale(1.08); }
     }
 
     .options-container {
@@ -162,6 +235,18 @@
 </head>
 <body>
 
+  <!-- ELEMENTOS FLUTUANTES GRANDES E NÍTIDOS -->
+  <div class="bg-animation">
+    <div class="floating-item item-yellow" style="left: 5%; font-size: 100px; animation-duration: 10s; animation-delay: 0s;">?</div>
+    <div class="floating-item item-white"  style="left: 22%; font-size: 90px;  animation-duration: 14s; animation-delay: 2s;">⚽</div>
+    <div class="floating-item item-red"    style="left: 38%; font-size: 110px; animation-duration: 12s; animation-delay: 4s;">?</div>
+    <div class="floating-item item-yellow" style="left: 54%; font-size: 80px;  animation-duration: 16s; animation-delay: 1s;">🟨</div>
+    <div class="floating-item item-yellow" style="left: 70%; font-size: 105px; animation-duration: 11s; animation-delay: 3s;">?</div>
+    <div class="floating-item item-red"    style="left: 85%; font-size: 85px;  animation-duration: 13s; animation-delay: 5s;">🟥</div>
+    <div class="floating-item item-white"  style="left: 15%; font-size: 75px;  animation-duration: 15s; animation-delay: 6s;">❓</div>
+    <div class="floating-item item-yellow" style="left: 80%; font-size: 95px;  animation-duration: 12s; animation-delay: 7s;">?</div>
+  </div>
+
   <!-- TELA 1: CADASTRO DO ÁRBITRO -->
   <div id="startScreen" class="screen active">
     <h2>Avaliação Tática de Arbitragem</h2>
@@ -179,7 +264,6 @@
     </div>
 
     <div class="game-container">
-      <!-- Adicionado playsinline e webkit-playsinline para impedir o fullscreen automático no celular -->
       <video id="player" controls playsinline webkit-playsinline>
         <source src="lance_arbitragem.mp4" type="video/mp4">
       </video>
@@ -188,8 +272,8 @@
       <div id="decisionOverlay" class="overlay">
         <div id="timer" class="timer-circle">5</div>
         <div class="options-container">
-          <button class="btn-option" onclick="processarResposta(true)">GOL Legal</button>
-          <button class="btn-option" onclick="processarResposta(false)">GOL Ilegal (Impedimento)</button>
+          <button class="btn-option" onclick="processarResposta(true)">Pênalti</button>
+          <button class="btn-option" onclick="processarResposta(false)">Não Pênalti</button>
         </div>
       </div>
 
@@ -216,7 +300,7 @@
     let pontuacao = 0;
     const PONTOS_POR_ACERTO = 10;
 
-    const SEGUNDO_DA_PAUSA = 10; 
+    const SEGUNDO_DA_PAUSA = 3; 
 
     let tempoRestante = 5;
     let timerInterval = null;
@@ -227,7 +311,58 @@
     const timerElement = document.getElementById('timer');
     const feedback = document.getElementById('feedback');
 
+    // --- GERADOR DE ÁUDIO DO RELÓGIO REFORÇADO (Web Audio API) ---
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTickSound(highPitch = false) {
+      if (!audioCtx) return;
+      
+      const now = audioCtx.currentTime;
+      
+      // Oscilador Principal (Corpo do Som)
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      // Oscilador Secundário (Clique Seco do Relógio)
+      const clickOsc = audioCtx.createOscillator();
+      const clickGain = audioCtx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(highPitch ? 1200 : 900, now);
+
+      gain.gain.setValueAtTime(1.0, now); // Volume aumentado ao máximo (1.0)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+      clickOsc.type = 'square';
+      clickOsc.frequency.setValueAtTime(highPitch ? 2500 : 2000, now);
+
+      clickGain.gain.setValueAtTime(0.8, now);
+      clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      clickOsc.connect(clickGain);
+      clickGain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.12);
+
+      clickOsc.start(now);
+      clickOsc.stop(now + 0.03);
+    }
+
     function iniciarTeste() {
+      initAudio(); // Inicializa o motor de som
       const nameInput = document.getElementById('refereeName').value;
       if (!nameInput.trim()) {
         alert("Por favor, digite o nome do árbitro!");
@@ -261,11 +396,15 @@
       tempoRestante = 5;
       timerElement.innerText = tempoRestante;
 
+      playTickSound(true); // Primeiro clique
+
       timerInterval = setInterval(() => {
         tempoRestante--;
         timerElement.innerText = tempoRestante;
 
-        if (tempoRestante <= 0) {
+        if (tempoRestante > 0) {
+          playTickSound(tempoRestante <= 2); // Som de tiquetaque bem forte a cada segundo
+        } else {
           clearInterval(timerInterval);
           processarResposta(false);
         }
