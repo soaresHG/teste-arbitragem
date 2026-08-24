@@ -20,8 +20,8 @@
 
     .screen {
       display: none;
-      width: 1200px; /* Aumentado de 800px para 1200px */
-      max-width: 98vw; /* Ocupa quase toda a largura da tela */
+      width: 1200px;
+      max-width: 98vw;
       background: #1e1e1e;
       padding: 25px;
       border-radius: 12px;
@@ -72,15 +72,13 @@
       font-weight: bold;
     }
 
-    /* Vídeo expandido para ocupar toda a área útil */
     video { 
       width: 100%; 
-      max-height: 75vh; /* Garante que o vídeo fique bem alto na tela sem precisar rolar */
+      max-height: 75vh;
       display: block; 
       object-fit: contain;
     }
 
-    /* Tela de decisão transparente sobre o vídeo */
     .overlay {
       position: absolute;
       top: 0;
@@ -141,7 +139,6 @@
       transform: scale(1.03);
     }
 
-    /* Feedback visual (Aviso de Acerto/Erro) */
     .feedback-banner {
       position: absolute;
       top: 50%;
@@ -182,8 +179,8 @@
     </div>
 
     <div class="game-container">
-      <video id="player" controls>
-        <!-- Coloque aqui o vídeo com o árbitro borrado -->
+      <!-- Adicionado playsinline e webkit-playsinline para impedir o fullscreen automático no celular -->
+      <video id="player" controls playsinline webkit-playsinline>
         <source src="lance_arbitragem.mp4" type="video/mp4">
       </video>
 
@@ -191,9 +188,8 @@
       <div id="decisionOverlay" class="overlay">
         <div id="timer" class="timer-circle">5</div>
         <div class="options-container">
-          <!-- Altere o texto das opções conforme a regra/lance -->
-          <button class="btn-option" onclick="processarResposta(true)">Marcar Pênalti</button>
-          <button class="btn-option" onclick="processarResposta(false)">Mandar Seguir (Sem Falta)</button>
+          <button class="btn-option" onclick="processarResposta(true)">GOL Legal</button>
+          <button class="btn-option" onclick="processarResposta(false)">GOL Ilegal (Impedimento)</button>
         </div>
       </div>
 
@@ -214,15 +210,13 @@
   </div>
 
   <script>
-    // URL do seu Google Apps Script mantida intacta
     const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbzLpEZYsWf1yGnDp3JhXTUz2UvgiKgC5G54YWc-PDlxrJUOxHnLAd06ggvBrZHepAB4sg/exec";
 
     let nomeArbitro = "";
     let pontuacao = 0;
     const PONTOS_POR_ACERTO = 10;
 
-    // Ajuste aqui o segundo exato em que a infração/duvida acontece:
-    const SEGUNDO_DA_PAUSA = 8; 
+    const SEGUNDO_DA_PAUSA = 10; 
 
     let tempoRestante = 5;
     let timerInterval = null;
@@ -250,7 +244,6 @@
       document.getElementById('gameScreen').classList.add('active');
     }
 
-    // Monitora o tempo do vídeo para pausar no momento da decisão
     player.addEventListener('timeupdate', () => {
       if (Math.floor(player.currentTime) === SEGUNDO_DA_PAUSA && !decisaoTomada) {
         player.pause();
@@ -258,7 +251,6 @@
       }
     });
 
-    // Quando o vídeo chegar ao fim completo, encerra o teste
     player.addEventListener('ended', () => {
       finalizarEEnviar();
     });
@@ -275,7 +267,7 @@
 
         if (tempoRestante <= 0) {
           clearInterval(timerInterval);
-          processarResposta(false); // Estourou os 5 segundos = Decisão Errada
+          processarResposta(false);
         }
       }, 1000);
     }
@@ -295,10 +287,9 @@
         feedback.innerText = tempoRestante <= 0 ? "Tempo Esgotado!" : "Decisão Incorreta!";
       }
 
-      // Exibe o feedback por 1.5 segundo e continua o vídeo
       setTimeout(() => {
         feedback.style.display = 'none';
-        player.play(); // O lance despausa e continua rodando até o fim
+        player.play();
       }, 1500);
     }
 
