@@ -217,18 +217,29 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      padding: 25px 50px;
-      font-size: 42px;
+      padding: 25px 40px;
+      font-size: 32px;
       font-weight: bold;
       border-radius: 10px;
       text-transform: uppercase;
       display: none;
       z-index: 10;
       box-shadow: 0 0 25px rgba(0,0,0,0.8);
+      text-align: center;
+      line-height: 1.4;
     }
 
     .feedback-correct { background-color: #2e7d32; color: white; }
     .feedback-wrong { background-color: #c62828; color: white; }
+
+    .correct-answer-detail {
+      font-size: 22px;
+      display: block;
+      margin-top: 8px;
+      color: #ffeb3b;
+      font-weight: normal;
+      text-transform: none;
+    }
 
     .saving-status { font-size: 14px; color: #aaa; margin-top: 10px; }
   </style>
@@ -272,8 +283,9 @@
       <div id="decisionOverlay" class="overlay">
         <div id="timer" class="timer-circle">5</div>
         <div class="options-container">
-          <button class="btn-option" onclick="processarResposta(true)">Pênalti</button>
-          <button class="btn-option" onclick="processarResposta(false)">Não Pênalti</button>
+          <!-- A opção que passa 'true' é a considerada CORRETA -->
+          <button class="btn-option" id="btnOptTrue" onclick="processarResposta(true)">Pênalti</button>
+          <button class="btn-option" id="btnOptFalse" onclick="processarResposta(false)">Não Pênalti</button>
         </div>
       </div>
 
@@ -328,18 +340,16 @@
       
       const now = audioCtx.currentTime;
       
-      // Oscilador Principal (Corpo do Som)
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
 
-      // Oscilador Secundário (Clique Seco do Relógio)
       const clickOsc = audioCtx.createOscillator();
       const clickGain = audioCtx.createGain();
 
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(highPitch ? 1200 : 900, now);
 
-      gain.gain.setValueAtTime(1.0, now); // Volume aumentado ao máximo (1.0)
+      gain.gain.setValueAtTime(1.0, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
 
       clickOsc.type = 'square';
@@ -362,7 +372,7 @@
     }
 
     function iniciarTeste() {
-      initAudio(); // Inicializa o motor de som
+      initAudio();
       const nameInput = document.getElementById('refereeName').value;
       if (!nameInput.trim()) {
         alert("Por favor, digite o nome do árbitro!");
@@ -396,14 +406,14 @@
       tempoRestante = 5;
       timerElement.innerText = tempoRestante;
 
-      playTickSound(true); // Primeiro clique
+      playTickSound(true);
 
       timerInterval = setInterval(() => {
         tempoRestante--;
         timerElement.innerText = tempoRestante;
 
         if (tempoRestante > 0) {
-          playTickSound(tempoRestante <= 2); // Som de tiquetaque bem forte a cada segundo
+          playTickSound(tempoRestante <= 2);
         } else {
           clearInterval(timerInterval);
           processarResposta(false);
@@ -416,6 +426,9 @@
       overlay.classList.remove('active');
       feedback.style.display = 'block';
 
+      // Captura o texto do botão que contém a opção correta
+      const textoOpcaoCorreta = document.getElementById('btnOptTrue').innerText;
+
       if (isCorreta) {
         pontuacao += PONTOS_POR_ACERTO;
         document.getElementById('displayScore').innerText = pontuacao;
@@ -423,13 +436,17 @@
         feedback.innerText = "Decisão Correta!";
       } else {
         feedback.className = "feedback-banner feedback-wrong";
-        feedback.innerText = tempoRestante <= 0 ? "Tempo Esgotado!" : "Decisão Incorreta!";
+        const motivo = tempoRestante <= 0 ? "Tempo Esgotado!" : "Decisão Incorreta!";
+        
+        // Exibe o motivo e aponta a resposta correta abaixo
+        feedback.innerHTML = `${motivo}<span class="correct-answer-detail">Decisão Correta: <strong>${textoOpcaoCorreta}</strong></span>`;
       }
 
+      // Mantém a mensagem visível por 2.5 segundos para leitura clara antes de continuar o vídeo
       setTimeout(() => {
         feedback.style.display = 'none';
         player.play();
-      }, 1500);
+      }, 2500);
     }
 
     function finalizarEEnviar() {
